@@ -16,6 +16,10 @@ def read_fasta(dir):
     return seqs
 
 def kl_divergence(p, q):
+    p = np.copy(p)
+    q = np.copy(q)
+    p = p / sum(p)
+    q = q / sum(q)
     return np.sum(np.where(p != 0, p * np.log(p / q), 0))
 
 def get_top_frequency(sequences, motiflength, top=10, frequency=None):
@@ -169,7 +173,7 @@ correct_poss_predicted = []
 correct_sites_predicted = []
 for parameter in parameters:
     for i in range(10):
-        correct_site_predicted,correct_pos_predicted,acc, kl_dis = main("../" + parameter + "/trial" + str(i), "../output/" + parameter + "_trial" + str(i),100)
+        correct_site_predicted,correct_pos_predicted,acc, kl_dis = main("../" + parameter + "/trial" + str(i), "../output(top=10)/" + parameter + "_trial" + str(i),9)
         accs.append(acc)
         correct_poss_predicted.append(correct_pos_predicted)
         correct_sites_predicted.append(correct_site_predicted)
@@ -189,6 +193,6 @@ data['correct_pos_predicted'] = correct_poss_predicted
 data['correct_sites_predicted'] = correct_sites_predicted
 
 df = pd.DataFrame(data)
-df.to_csv("../output/summary.tsv", sep='\t', index=False, columns=['parameters', 'trial_id', 'accuracy','correct_pos_predicted', 'correct_sites_predicted','kl_dis'])
+df.to_csv("../output(top=10)/summary.tsv", sep='\t', index=False, columns=['parameters', 'trial_id', 'accuracy','correct_pos_predicted', 'correct_sites_predicted','kl_dis'])
 
 
