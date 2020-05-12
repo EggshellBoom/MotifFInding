@@ -173,7 +173,7 @@ correct_poss_predicted = []
 correct_sites_predicted = []
 for parameter in parameters:
     for i in range(10):
-        correct_site_predicted,correct_pos_predicted,acc, kl_dis = main("../" + parameter + "/trial" + str(i), "../output(top=10)/" + parameter + "_trial" + str(i),9)
+        correct_site_predicted,correct_pos_predicted,acc, kl_dis = main("../" + parameter + "/trial" + str(i), "../output(top=50)/" + parameter + "_trial" + str(i),50)
         accs.append(acc)
         correct_poss_predicted.append(correct_pos_predicted)
         correct_sites_predicted.append(correct_site_predicted)
@@ -193,6 +193,6 @@ data['correct_pos_predicted'] = correct_poss_predicted
 data['correct_sites_predicted'] = correct_sites_predicted
 
 df = pd.DataFrame(data)
-df.to_csv("../output(top=10)/summary.tsv", sep='\t', index=False, columns=['parameters', 'trial_id', 'accuracy','correct_pos_predicted', 'correct_sites_predicted','kl_dis'])
+df.to_csv("../output(top=50)/summary.tsv", sep='\t', index=False, columns=['parameters', 'trial_id', 'accuracy','correct_pos_predicted', 'correct_sites_predicted','kl_dis'])
 
 
