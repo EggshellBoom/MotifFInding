@@ -18,7 +18,7 @@ def read_fasta(dir):
 def kl_divergence(p, q):
     return np.sum(np.where(p != 0, p * np.log(p / q), 0))
 
-def get_top_frequency(sequences, motiflength, top=10):
+def get_top_frequency(sequences, motiflength, top=10, frequency=None):
     dict = {}
     for sequence in sequences:
         for index in range(len(sequence)):
@@ -38,30 +38,37 @@ def get_top_frequency(sequences, motiflength, top=10):
     top = values[top]
 
     motifs = []
+    frequency = []
     for key in dict.keys():
         if dict[key] > top:
             motifs.append(key)
-    return motifs
+            frequency.append(dict[key])
+    return motifs, frequency
 
-def get_result(seq):
+def get_result(seq, frequency=None):
     count = {}
     count['A'] = 0
     count['C'] = 0
     count['G'] = 0
     count['T'] = 0
-    for i in seq:
-        count[i] = count[i] + 1
-    sum = len(seq)
+    sum = 0
+    for index, i in enumerate(seq):
+        if frequency is None:
+            weight = 1
+        else:
+            weight = frequency[index]
+        count[i] = count[i] + weight
+        sum = sum + weight
     result = np.array([count['A'], count['C'], count['G'], count['T']]).astype(np.float) / sum
     return result
 
-def get_motif(motifs, motiflength):
+def get_motif(motifs, motiflength, frequency = None):
     results = []
     for i in range(motiflength):
         seq = []
         for motif in motifs:
             seq.append(motif[i])
-        results.append(get_result(seq))
+        results.append(get_result(seq, frequency))
     return results
 
 def get_prob(motif, sequence):
@@ -100,8 +107,8 @@ def main(dir, output_dir,top = 100):
         motifs.append(np.array(motif).astype(np.float))
 
 
-    top_motifs = get_top_frequency(sequences, motiflength, top=top)
-    motif = get_motif(top_motifs, motiflength)
+    top_motifs,frequency = get_top_frequency(sequences, motiflength, top=top)
+    motif = get_motif(top_motifs, motiflength, frequency)
 
     site_results = []
     best_motifs = []
@@ -162,7 +169,7 @@ correct_poss_predicted = []
 correct_sites_predicted = []
 for parameter in parameters:
     for i in range(10):
-        correct_site_predicted,correct_pos_predicted,acc, kl_dis = main("../" + parameter + "/trial" + str(i), "../output/" + parameter + "_trial" + str(i),9)
+        correct_site_predicted,correct_pos_predicted,acc, kl_dis = main("../" + parameter + "/trial" + str(i), "../output/" + parameter + "_trial" + str(i),100)
         accs.append(acc)
         correct_poss_predicted.append(correct_pos_predicted)
         correct_sites_predicted.append(correct_site_predicted)
