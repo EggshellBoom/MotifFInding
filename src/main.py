@@ -3,6 +3,7 @@ import numpy as np
 from scipy import special
 import os
 import pandas as pd
+import random
 import timeit
 
 parameters = ["param[1, 7, 10]", "param[1.5, 6, 10]", "param[1.5, 7, 10]", "param[1.5, 7, 20]", "param[1.5, 7, 5]", "param[1.5, 8, 10]", "param[2, 7, 10]"]
@@ -123,7 +124,8 @@ def main(dir, output_dir,top = 100):
             if i + motiflength > len(sequence):
                 continue
             probs.append(get_prob(motif, sequence[i:i + motiflength]))
-        best_prob_id = probs.index(max(probs))
+        # best_prob_id = probs.index(max(probs))
+        best_prob_id = random.randint(0, len(sequence) - motiflength - 1)
         site_results.append(best_prob_id)
         site_sequences.append(sequence[best_prob_id: best_prob_id+motiflength])
         best_motifs.append(sequence[best_prob_id: best_prob_id+motiflength])
@@ -140,6 +142,9 @@ def main(dir, output_dir,top = 100):
     best_motifs = np.array(best_motifs).reshape((-1))
     kl_dis = kl_divergence(motifs+0.00001, best_motifs+0.00001)
     return correct_site_predicted,correct_pos_predicted, acc, kl_dis
+
+
+
 
 start = timeit.default_timer()
 # best_acc = 0
@@ -173,7 +178,7 @@ correct_poss_predicted = []
 correct_sites_predicted = []
 for parameter in parameters:
     for i in range(10):
-        correct_site_predicted,correct_pos_predicted,acc, kl_dis = main("../" + parameter + "/trial" + str(i), "../output(top=50)/" + parameter + "_trial" + str(i),50)
+        correct_site_predicted,correct_pos_predicted,acc, kl_dis = main("../" + parameter + "/trial" + str(i), "../output(random)/" + parameter + "_trial" + str(i),50)
         accs.append(acc)
         correct_poss_predicted.append(correct_pos_predicted)
         correct_sites_predicted.append(correct_site_predicted)
@@ -193,6 +198,6 @@ data['correct_pos_predicted'] = correct_poss_predicted
 data['correct_sites_predicted'] = correct_sites_predicted
 
 df = pd.DataFrame(data)
-df.to_csv("../output(top=50)/summary.tsv", sep='\t', index=False, columns=['parameters', 'trial_id', 'accuracy','correct_pos_predicted', 'correct_sites_predicted','kl_dis'])
+df.to_csv("../output(random)/summary.tsv", sep='\t', index=False, columns=['parameters', 'trial_id', 'accuracy','correct_pos_predicted', 'correct_sites_predicted','kl_dis'])
 
 
